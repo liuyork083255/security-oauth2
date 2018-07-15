@@ -1,17 +1,18 @@
-package liu.york.controller;
+package liu.york.web.controller;
 
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.annotations.ApiOperation;
 import liu.york.dto.User;
 import liu.york.dto.UserQueryCondition;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +36,8 @@ public class UserController {
 
     /**
      * 1 这里没有加 @RequestBody 注解也是可以完成映射的
+     * 2 可以映射是因为传入的参数格式是 username=LiuYork&password=123456
+     *      如果传入的是 json 字符串，name必须 使用 @RequestBody 注解
      * @param userQueryCondition
      * @return
      */
@@ -91,6 +94,54 @@ public class UserController {
         user.setUsername("york");
         user.setPassword("123456");
         return user;
+    }
+
+    /**
+     * 1 利用 hibernate 校验字段
+     * @param user
+     */
+    @PostMapping("/json")
+    @ApiOperation(value = "swagger api 接口说明")
+    public void json(@Valid @RequestBody User user){
+        System.out.println(JSON.toJSONString(user, true));
+    }
+
+    /**
+     * 1 BindingResult 必须和 @Valid 搭配使用，如果加上了这个参数，那么校验失败是不会跑出异常，而是会进入方法体内部
+     * 2 hibernate 校验实例：
+     *      @NotNull    值不能为空
+     *      @Null       值必须为空
+     *      @Pattern    字符串必须满足正则表达式
+     *      @Size       集合的数量必须满足 min max 之间
+     *      @Email      字符串必须是Email 格式
+     *      @Length     字符串长度必须满足 min max 之间
+     *      @NotBlank   字符串必须不为空且长度不能为0
+     *      @NoteEmpty  字符串不能为null，集合有元素   可以放在字符串也可以放在集合上
+     *      @Range      数字必须在 min max 之间
+     *      @SafeHtml   字符串是安全的 html
+     *      @URL        字符串是合法 URL
+     *      @Future     值必须是未来的日期
+     *      @Past       值必须是过去的日期
+     *      @Max        值必须小于等于value指定的值，不能注解在字符串类型属相上
+     *      @Min        值必须大于等于value指定的值，不能注解在字符串类型属相上
+     * @param user
+     * @param errors
+     */
+    @PostMapping("/bind")
+    public void bindingResult(@Valid @RequestBody User user, BindingResult errors){
+        /*
+         * 1 如果user 的注解校验没有通过，那么 errors.hasErrors() true
+         *      if 里面是将所有错误信息循环并且打印出来
+         */
+        if(errors.hasErrors()){
+
+            errors.getAllErrors().forEach(error -> {
+                FieldError fieldError = (FieldError) error;
+                String message = fieldError.getField() + "：" + error.getDefaultMessage();
+                System.out.println(message);
+            });
+        }
+        System.out.println("past quest ... ");
     }
 }
 

@@ -6,13 +6,19 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Date;
 
 /**
  * 单元测试
@@ -107,6 +113,62 @@ public class AppTest
          * 如果不加 这个注解，那么 username 和 password 都会返回
          */
         System.out.println(contentAsString);
+    }
+
+    /**
+     * 测试 @RequestBody
+     * @throws Exception
+     */
+    @Test
+    public void testDate() throws Exception {
+        Date date = new Date();
+        String content = "{\"username\":\"LiuYork\",\"password\":\"123456\",\"birthday\":"+ date.getTime() + "}";
+
+        System.out.println(content);
+        mockMvc.perform(post("/json")
+                .contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .andExpect(status().isOk());
+
+    }
+
+    /**
+     * 测试
+     * @throws Exception
+     */
+    @Test
+    public void testBind() throws Exception {
+        Date date = new Date();
+        String content = "{\"password\":\"123456\",\"birthday\":"+ date.getTime() + "}";
+
+        System.out.println(content);
+        mockMvc.perform(post("/bind")
+                .contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .andExpect(status().isOk());
+
+    }
+
+    /**
+     * 文件上传测试
+     */
+    @Test
+    public void testFileUpload() throws Exception {
+        mockMvc.perform(
+                /*
+                 * fileUpload 请求其实是一个 post 请求
+                 */
+                fileUpload("/file/upload")
+                /*
+                 * 参数1：文件上传的参数名称
+                 * 参数2：原始文件名称
+                 * 参数3：表单请求头
+                 * 参数4：这里是文件字节数组，这里用字符串来模拟
+                 */
+                .file(new MockMultipartFile(
+                        "file",
+                        "test.txt",
+                        "multipart/form-data",
+                        "file-content".getBytes("UTF-8"))))
+                .andExpect(status().isOk());
     }
 }
 

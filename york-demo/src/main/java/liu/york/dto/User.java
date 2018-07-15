@@ -1,6 +1,11 @@
 package liu.york.dto;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.annotations.ApiModelProperty;
+import liu.york.validator.MyConstraint;
+import org.hibernate.validator.constraints.NotBlank;
+
+import java.util.Date;
 
 /**
  * 使用 JsonView 三步骤
@@ -16,8 +21,16 @@ public class User {
     public interface UserSimpleView {}
     public interface UserDetailView extends UserSimpleView {}
 
+    @NotBlank(message = "自定义异常信息...")
     private String username;
+    @ApiModelProperty(value = "swagger 字段说明")
     private String password;
+    /*
+     * 对于时间类型，最好使用时间戳，因为不同地方可能展示类型不同，所以这里采用时间戳
+     * 然后将时间戳转换成自己想要的格式
+     */
+    @MyConstraint //自定义的校验器
+    private Date birthday;
 
     public String getUsername() {
         return username;
