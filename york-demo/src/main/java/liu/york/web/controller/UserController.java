@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.ApiOperation;
 import liu.york.dto.User;
 import liu.york.dto.UserQueryCondition;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+//import org.springframework.data.domain.Pageable;
+//import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -54,13 +54,13 @@ public class UserController {
      *
      * @return
      */
-    @GetMapping("/page")
-    public List<User> page(String username, @PageableDefault(page = 1, size = 10, sort = {"username,asc"}) Pageable pageable){
-
-        System.out.println(JSON.toJSONString(pageable, true));
-
-        return Arrays.asList(new User(), new User(), new User());
-    }
+//    @GetMapping("/page")
+//    public List<User> page(String username, @PageableDefault(page = 1, size = 10, sort = {"username,asc"}) Pageable pageable){
+//
+//        System.out.println(JSON.toJSONString(pageable, true));
+//
+//        return Arrays.asList(new User(), new User(), new User());
+//    }
 
     /**
      * 1 rest 请求参数映射到方法参数中
