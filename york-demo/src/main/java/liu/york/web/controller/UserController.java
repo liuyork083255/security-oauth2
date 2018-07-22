@@ -8,6 +8,8 @@ import liu.york.dto.User;
 import liu.york.dto.UserQueryCondition;
 //import org.springframework.data.domain.Pageable;
 //import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,15 @@ public class UserController {
         return Arrays.asList(new User(), new User(), new User());
     }
 
+    /**
+     * SpringMVC 会自动从spring-security 里面查找 authentication， 所以这里会自定注入到这个参数参数里面的
+     * @param authentication
+     * @return
+     */
+    @GetMapping("/user/me")
+    public Object getInfo(Authentication authentication){
+        return authentication;
+    }
 
     /**
      * 1 这里没有加 @RequestBody 注解也是可以完成映射的
